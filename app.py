@@ -133,7 +133,7 @@ top_rec = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(10,5))
+fig, ax = plt.subplots(figsize=(14,7))
 sns.barplot(
     data=top_rec,
     x='brand',
@@ -158,7 +158,7 @@ top_rating = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(10,5))
+fig, ax = plt.subplots(figsize=(14,7))
 sns.barplot(
     data=top_rating,
     x='brand',
@@ -183,7 +183,7 @@ top_rate = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(10,5))
+fig, ax = plt.subplots(figsize=(14,7))
 sns.barplot(
     data=top_rate,
     x='brand',
@@ -207,7 +207,7 @@ low_index = brand_rep.sort_values(
     'repurchase_index'
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(10,5))
+fig, ax = plt.subplots(figsize=(14,7))
 sns.barplot(
     data=low_index,
     x='brand',
