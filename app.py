@@ -133,7 +133,7 @@ top_rec = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(14,7))
+fig, ax = plt.subplots(figsize=(14, 6))
 sns.barplot(
     data=top_rec,
     x='brand',
@@ -143,7 +143,8 @@ sns.barplot(
 )
 ax.set_xlabel("")
 ax.set_ylabel("Jumlah Rekomendasi")
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha='right', fontsize=10)
+plt.tight_layout()
 st.pyplot(fig)
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -158,7 +159,7 @@ top_rating = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(14,7))
+fig, ax = plt.subplots(figsize=(14, 6))
 sns.barplot(
     data=top_rating,
     x='brand',
@@ -168,7 +169,8 @@ sns.barplot(
 )
 ax.set_xlabel("")
 ax.set_ylabel("Total Rating")
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha='right', fontsize=10)
+plt.tight_layout()
 st.pyplot(fig)
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -183,7 +185,7 @@ top_rate = brand_rep.sort_values(
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(14,7))
+fig, ax = plt.subplots(figsize=(14, 6))
 sns.barplot(
     data=top_rate,
     x='brand',
@@ -193,7 +195,8 @@ sns.barplot(
 )
 ax.set_xlabel("")
 ax.set_ylabel("Repurchase Rate")
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha='right', fontsize=10)
+plt.tight_layout()
 st.pyplot(fig)
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -207,7 +210,7 @@ low_index = brand_rep.sort_values(
     'repurchase_index'
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(14,7))
+fig, ax = plt.subplots(figsize=(14, 6))
 sns.barplot(
     data=low_index,
     x='brand',
@@ -217,6 +220,7 @@ sns.barplot(
 )
 ax.set_xlabel("")
 ax.set_ylabel("Repurchase Index")
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha='right', fontsize=10)
+plt.tight_layout()
 st.pyplot(fig)
 st.markdown("</div>", unsafe_allow_html=True)
