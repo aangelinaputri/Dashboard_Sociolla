@@ -68,33 +68,61 @@ min_repurchase = st.sidebar.slider(
     ),
     value=30
 )
+min_produk = st.sidebar.slider(
+    "Minimal jumlah produk per brand",
+    min_value=1,
+    max_value=int(
+        data.groupby('brand').size().max()
+    ),
+    value=2
+)
+min_rating = st.sidebar.slider(
+    "Minimal rata-rata rating brand",
+    min_value=1.0,
+    max_value=5.0,
+    value=1.0,
+    step=0.1
+)
 
 # =====================
 # DATA PREPARATION
 # =====================
-brand_rep = data.groupby('brand').agg({
+brand_rep_all = data.groupby('brand').agg({
     'repurchase_yes_num_imputed_median': 'sum',
     'repurchase_no_num_imputed_median': 'sum',
-    'rating_imputed_median': 'sum',
+    'rating_imputed_median': 'mean',
     'number_of_recommendations_imputed_median': 'sum'
 }).reset_index()
 
-brand_rep['total_repurchase'] = (
-    brand_rep['repurchase_yes_num_imputed_median'] +
-    brand_rep['repurchase_no_num_imputed_median']
+brand_count = (
+    data.groupby('brand')
+    .size()
+    .reset_index(name='total_produk')
 )
 
-brand_rep = brand_rep[brand_rep['total_repurchase'] >= min_repurchase]
+brand_rep_all = brand_rep_all.merge(brand_count, on='brand')
 
-brand_rep['repurchase_rate'] = (
-    brand_rep['repurchase_yes_num_imputed_median'] /
-    brand_rep['total_repurchase']
+brand_rep_all['total_repurchase'] = (
+    brand_rep_all['repurchase_yes_num_imputed_median'] +
+    brand_rep_all['repurchase_no_num_imputed_median']
 )
 
-brand_rep['repurchase_index'] = (
-    brand_rep['repurchase_yes_num_imputed_median'] -
-    brand_rep['repurchase_no_num_imputed_median']
-) / brand_rep['total_repurchase']
+brand_rep_all['repurchase_rate'] = (
+    brand_rep_all['repurchase_yes_num_imputed_median'] /
+    brand_rep_all['total_repurchase']
+)
+
+brand_rep_all['repurchase_index'] = (
+    brand_rep_all['repurchase_yes_num_imputed_median'] -
+    brand_rep_all['repurchase_no_num_imputed_median']
+) / brand_rep_all['total_repurchase']
+
+brand_rep_filtered = brand_rep_all[
+    (brand_rep_all['total_repurchase'] >= min_repurchase) &
+    (brand_rep_all['total_produk'] >= min_produk) &
+    (brand_rep_all['rating_imputed_median'] >= min_rating)
+]
+
 
 # =====================
 # METRICS
@@ -102,18 +130,18 @@ brand_rep['repurchase_index'] = (
 m1, m2, m3 = st.columns(3)
 
 with m1:
-    st.metric("💋 Total Brand", brand_rep.shape[0])
+    st.metric("💋 Total Brand", brand_rep_filtered.shape[0])
 
 with m2:
     st.metric(
         "⭐ Rata-rata Rating",
-        round(brand_rep['rating_imputed_median'].mean(), 2)
+        round(brand_rep_filtered['rating_imputed_median'].mean(), 2)
     )
 
 with m3:
     st.metric(
         "🔁 Rata-rata Repurchase Rate",
-        round(brand_rep['repurchase_rate'].mean(), 2)
+        round(brand_rep_filtered['repurchase_rate'].mean(), 2)
     )
 
 # =====================
@@ -128,7 +156,7 @@ palette_pink = sns.color_palette("pink", 15)
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
 st.subheader("🔝 Brand dengan Rekomendasi Terbanyak")
 
-top_rec = brand_rep.sort_values(
+top_rec = brand_rep_filtered.sort_values(
     'number_of_recommendations_imputed_median',
     ascending=False
 ).head(15)
@@ -154,7 +182,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
 st.subheader("⭐ Brand dengan Rating Tertinggi")
 
-top_rating = brand_rep.sort_values(
+top_rating = brand_rep_filtered.sort_values(
     'rating_imputed_median',
     ascending=False
 ).head(15)
@@ -180,7 +208,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
 st.subheader("🔁 Brand dengan Repurchase Rate Tertinggi")
 
-top_rate = brand_rep.sort_values(
+top_rate = brand_rep_filtered.sort_values(
     'repurchase_rate',
     ascending=False
 ).head(15)
@@ -206,7 +234,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
 st.subheader("⚠️ Brand dengan Repurchase Index Terendah")
 
-low_index = brand_rep.sort_values(
+low_index = brand_rep_filtered.sort_values(
     'repurchase_index'
 ).head(15)
 
