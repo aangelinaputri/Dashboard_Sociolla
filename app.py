@@ -37,6 +37,25 @@ h1, h2, h3 {
     box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     margin-bottom: 30px;
 }
+.kpi-card {
+    background-color: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom : 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    text-align: center;
+}
+.kpi-title {
+    font-size: 14px;
+    color: #7a2048;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+.kpi-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #d6336c;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -127,22 +146,51 @@ brand_rep_filtered = brand_rep_all[
 # =====================
 # METRICS
 # =====================
-m1, m2, m3 = st.columns(3)
+st.markdown("## 📊 Ringkasan Utama")
 
-with m1:
-    st.metric("💋 Total Brand", brand_rep_filtered.shape[0])
+k1, k2, k3, k4, k5 = st.columns(5)
 
-with m2:
-    st.metric(
-        "⭐ Rata-rata Rating",
-        round(brand_rep_filtered['rating_imputed_median'].mean(), 2)
-    )
+with k1:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">Total Brand</div>
+        <div class="kpi-value">{brand_rep_filtered.shape[0]}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with m3:
-    st.metric(
-        "🔁 Rata-rata Repurchase Rate",
-        round(brand_rep_filtered['repurchase_rate'].mean(), 2)
-    )
+with k2:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">Rata Rating</div>
+        <div class="kpi-value">{round(brand_rep_filtered['rating_imputed_median'].mean(), 2)}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with k3:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">Rata Repurchase</div>
+        <div class="kpi-value">{round(brand_rep_filtered['repurchase_rate'].mean(), 2)}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with k4:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">Total Produk</div>
+        <div class="kpi-value">{int(brand_rep_filtered['total_produk'].sum())}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with k5:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">Total Rekomendasi</div>
+        <div class="kpi-value">{int(brand_rep_filtered['number_of_recommendations_imputed_median'].sum())}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 
 # =====================
 # CHART STYLE
@@ -154,14 +202,14 @@ palette_pink = sns.color_palette("pink", 15)
 # CHART 1
 # =====================
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-st.subheader("🔝 Brand dengan Rekomendasi Terbanyak")
+st.subheader("Brand dengan Rekomendasi Terbanyak")
 
 top_rec = brand_rep_filtered.sort_values(
     'number_of_recommendations_imputed_median',
     ascending=False
 ).head(15)
 
-fig, ax = plt.subplots(figsize=(14, 6))
+fig, ax = plt.subplots(figsize=(16, 6))
 sns.barplot(
     data=top_rec,
     x='brand',
@@ -169,18 +217,17 @@ sns.barplot(
     palette=palette_pink,
     ax=ax
 )
-ax.set_xlabel("")
-ax.set_ylabel("Jumlah Rekomendasi")
-plt.xticks(rotation=45, ha='right', fontsize=10)
-plt.tight_layout()
+plt.xticks(rotation=45, ha='right')
 st.pyplot(fig)
+
 st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =====================
 # CHART 2
 # =====================
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-st.subheader("⭐ Brand dengan Rating Tertinggi")
+st.subheader("Brand dengan Rating Tertinggi")
 
 top_rating = brand_rep_filtered.sort_values(
     'rating_imputed_median',
@@ -205,50 +252,91 @@ st.markdown("</div>", unsafe_allow_html=True)
 # =====================
 # CHART 3
 # =====================
-st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-st.subheader("🔁 Brand dengan Repurchase Rate Tertinggi")
+c1, c2 = st.columns(2)
 
-top_rate = brand_rep_filtered.sort_values(
+# =====================
+# CHART: REPURCHASE RATE TERTINGGI
+# =====================
+with c1:
+    st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+    st.subheader("Brand dengan Repurchase Rate Tertinggi")
+
+    top_rate = brand_rep_filtered.sort_values(
     'repurchase_rate',
     ascending=False
-).head(15)
+).head(5)
 
-fig, ax = plt.subplots(figsize=(14, 6))
-sns.barplot(
-    data=top_rate,
-    x='brand',
-    y='repurchase_rate',
-    palette="Blues",
-    ax=ax
-)
-ax.set_xlabel("")
-ax.set_ylabel("Repurchase Rate")
-plt.xticks(rotation=45, ha='right', fontsize=10)
-plt.tight_layout()
-st.pyplot(fig)
-st.markdown("</div>", unsafe_allow_html=True)
+    fig, ax = plt.subplots(figsize=(7, 5))
+    sns.barplot(
+        data=top_rate,  # variabel ASLI
+        x='brand',
+        y='repurchase_rate',
+        palette="Blues",
+        ax=ax
+    )
+    ax.set_xlabel("Repurchase Rate")
+    ax.set_ylabel("")
+    st.pyplot(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # =====================
-# CHART 4
+# CHART: REPURCHASE INDEX TERENDAH
+# =====================
+with c2:
+    st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
+    st.subheader("Brand dengan Repurchase Index Terendah")
+
+    low_index = brand_rep_filtered.sort_values(
+    'repurchase_index'
+).head(5)
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    sns.barplot(
+        data=low_index,  # variabel ASLI
+        x='brand',
+        y='repurchase_index',
+        palette="coolwarm",
+        ax=ax
+    )
+    ax.set_xlabel("Repurchase Index")
+    ax.set_ylabel("")
+    st.pyplot(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =====================
+# CHART: Perbandingan
 # =====================
 st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-st.subheader("⚠️ Brand dengan Repurchase Index Terendah")
+st.subheader("Perbandingan Repurchase Yes vs No (Top 15 Brand)")
 
-low_index = brand_rep_filtered.sort_values(
-    'repurchase_index'
-).head(15)
+top_rep = brand_rep_filtered.sort_values(
+    'total_repurchase',
+    ascending=False
+).head(10)
 
-fig, ax = plt.subplots(figsize=(14, 6))
+top_rep_melt = top_rep.melt(
+    id_vars='brand',
+    value_vars=[
+        'repurchase_yes_num_imputed_median',
+        'repurchase_no_num_imputed_median'
+    ],
+    var_name='Tipe',
+    value_name='Jumlah'
+)
+
+fig, ax = plt.subplots(figsize=(16, 6))
 sns.barplot(
-    data=low_index,
+    data=top_rep_melt,
     x='brand',
-    y='repurchase_index',
-    palette="coolwarm",
+    y='Jumlah',
+    hue='Tipe',
     ax=ax
 )
-ax.set_xlabel("")
-ax.set_ylabel("Repurchase Index")
-plt.xticks(rotation=45, ha='right', fontsize=10)
+
+ax.set_xlabel("Brand")
+ax.set_ylabel("Jumlah Repurchase")
+plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
+
 st.pyplot(fig)
 st.markdown("</div>", unsafe_allow_html=True)
